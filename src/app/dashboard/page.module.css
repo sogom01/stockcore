@@ -77,9 +77,14 @@
 
 /* Responsive */
 @media (max-width: 1280px) {
-  .kpiRow  { grid-template-columns: repeat(2,1fr); }
+  .kpiRow { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 900px) {
   .midGrid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .kpiRow { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 400px) {
+  .kpiValue { font-size: 1.5rem; } /* evita desborde del número en pantallas muy pequeñas */
 }

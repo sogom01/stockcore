@@ -26,6 +26,20 @@ type Props = {
 
 const PAGE_SIZE = 20;
 
+/** Genera la lista de números/ellipsis para la paginación. Máx 7 items visibles. */
+function buildPageList(current: number, total: number): (number | "…")[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | "…")[] = [];
+  if (current <= 4) {
+    pages.push(1, 2, 3, 4, 5, "…", total);
+  } else if (current >= total - 3) {
+    pages.push(1, "…", total - 4, total - 3, total - 2, total - 1, total);
+  } else {
+    pages.push(1, "…", current - 1, current, current + 1, "…", total);
+  }
+  return pages;
+}
+
 export default function ProductsClient({ categories, suppliers, role, initialSearch = "" }: Props) {
   const [products, setProducts]     = useState<Product[]>([]);
   const [total, setTotal]           = useState(0);
@@ -260,15 +274,19 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
               <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <span className={styles.paginPages}>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                <button
-                  key={n}
-                  className={`${styles.paginNum}${n === page ? ` ${styles.paginNumActive}` : ""}`}
-                  onClick={() => setPage(n)}
-                >
-                  {n}
-                </button>
-              ))}
+              {buildPageList(page, totalPages).map((n, i) =>
+                n === "…" ? (
+                  <span key={`ellipsis-${i}`} className={styles.paginEllipsis}>…</span>
+                ) : (
+                  <button
+                    key={n}
+                    className={`${styles.paginNum}${n === page ? ` ${styles.paginNumActive}` : ""}`}
+                    onClick={() => setPage(n as number)}
+                  >
+                    {n}
+                  </button>
+                )
+              )}
             </span>
             <button
               className={styles.paginBtn}
