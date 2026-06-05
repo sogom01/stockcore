@@ -15,6 +15,9 @@ export async function GET(req: NextRequest) {
   const page     = Math.max(1, Number(searchParams.get("page") ?? "1"));
   const pageSize = Math.min(100, Math.max(1, Number(searchParams.get("pageSize") ?? String(PAGE_SIZE))));
 
+  const categoryId = searchParams.get("categoryId");
+  const supplierId = searchParams.get("supplierId");
+
   const baseWhere = {
     status: "ACTIVE" as const,
     ...(q && {
@@ -23,6 +26,8 @@ export async function GET(req: NextRequest) {
         { sku:  { contains: q, mode: "insensitive" as const } },
       ],
     }),
+    ...(categoryId && { categoryId }),
+    ...(supplierId && { supplierId }),
   };
 
   // stock filter applied post-query for "low" (needs per-row comparison),

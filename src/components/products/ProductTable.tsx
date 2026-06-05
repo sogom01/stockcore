@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import styles from "./Products.module.css";
 
 type Product = {
@@ -72,7 +73,7 @@ export default function ProductTable({ products, role, onEdit, onDelete, onStock
                         {p.name[0].toUpperCase()}
                       </div>
                       <div>
-                        <div className={styles.productName}>{p.name}</div>
+                        <Link href={`/dashboard/productos/${p.id}`} className={styles.productName}>{p.name}</Link>
                         <div className={styles.productSku}>{p.sku}</div>
                       </div>
                     </div>

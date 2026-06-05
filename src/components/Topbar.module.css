@@ -14,8 +14,7 @@
   display: none;
   flex-direction: column; justify-content: center; align-items: center;
   gap: 4px; width: 32px; height: 32px; flex-shrink: 0;
-  background: none; border: 1px solid var(--border2); cursor: pointer;
-  padding: 0;
+  background: none; border: 1px solid var(--border2); cursor: pointer; padding: 0;
 }
 .hamburger span {
   display: block; width: 14px; height: 1.5px;
@@ -34,25 +33,18 @@
   display: flex; align-items: center;
   gap: .5rem; flex-shrink: 0;
 }
-
 .brandMark {
-  width: 28px; height: 28px;
-  background: var(--ink);
+  width: 28px; height: 28px; background: var(--ink);
   display: flex; align-items: center; justify-content: center;
 }
 .brandMark svg { width: 14px; height: 14px; }
-
 .brandName {
-  font-family: var(--font-d);
-  font-size: 1rem; font-weight: 800;
+  font-family: var(--font-d); font-size: 1rem; font-weight: 800;
   letter-spacing: .04em; color: var(--ink);
 }
-
 .brandSep { width: 1px; height: 18px; background: var(--border2); }
-
 .brandScope {
-  font-size: .7rem; font-weight: 500;
-  color: var(--ink3); letter-spacing: .03em;
+  font-size: .7rem; font-weight: 500; color: var(--ink3); letter-spacing: .03em;
 }
 
 /* ── Nav ── */
@@ -63,16 +55,12 @@
   overflow-x: auto; scrollbar-width: none;
 }
 .nav::-webkit-scrollbar { display: none; }
-
 .tnav {
-  font-family: var(--font-d);
-  font-size: .7rem; font-weight: 600;
+  font-family: var(--font-d); font-size: .7rem; font-weight: 600;
   letter-spacing: .06em; text-transform: uppercase;
-  padding: .45rem 1rem;
-  color: var(--ink4); background: none; border: none;
+  padding: .45rem 1rem; color: var(--ink4); background: none; border: none;
   cursor: pointer; border-bottom: 2px solid transparent;
-  transition: color .15s, border-color .15s;
-  white-space: nowrap;
+  transition: color .15s, border-color .15s; white-space: nowrap;
 }
 .tnav:hover { color: var(--ink2); }
 .tnav.active { color: var(--ink); border-bottom-color: var(--ink); }
@@ -80,28 +68,65 @@
 /* ── Right ── */
 .right {
   display: flex; align-items: center;
-  gap: .75rem; margin-left: auto; flex-shrink: 0;
+  gap: .625rem; margin-left: auto; flex-shrink: 0;
 }
 
-/* ── Global Search ── */
-.searchBtn {
-  width: 30px; height: 30px;
+/* ── Icon buttons (search, bell, theme) ── */
+.iconBtn {
+  position: relative;
+  width: 30px; height: 30px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: none; border: 1px solid var(--border2); cursor: pointer;
-  transition: all .15s; flex-shrink: 0;
+  transition: all .15s;
 }
-.searchBtn:hover { background: var(--bg); border-color: var(--ink3); }
-.searchBtn svg {
+.iconBtn svg {
   width: 13px; height: 13px;
-  stroke: var(--ink3); fill: none; stroke-width: 1.5; stroke-linecap: round;
+  stroke: var(--ink3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.iconBtn:hover { background: var(--bg); border-color: var(--ink3); }
+.iconBtn:hover svg { stroke: var(--ink); }
+.iconBtnAlert { border-color: var(--red-bd); }
+.iconBtnAlert svg { stroke: var(--red); }
+
+/* ── Alert badge ── */
+.alertBadge {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 14px; height: 14px; padding: 0 2px;
+  background: var(--red); color: white;
+  font-family: var(--font-m); font-size: .5rem; font-weight: 700;
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  line-height: 1;
 }
 
+/* ── Alert dropdown ── */
+.alertWrap { position: relative; }
+.alertDropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  width: 240px; background: var(--white); border: 1px solid var(--border2);
+  box-shadow: var(--shadow-lg); z-index: 300; animation: fadeIn .15s ease;
+}
+.alertDdHdr {
+  padding: .6rem .875rem; border-bottom: 1px solid var(--border);
+  font-family: var(--font-d); font-size: .72rem; font-weight: 700;
+  letter-spacing: .04em; color: var(--ink); text-transform: uppercase;
+}
+.alertDdItem {
+  display: flex; align-items: center; gap: .5rem;
+  width: 100%; padding: .625rem .875rem; border: none; background: none;
+  cursor: pointer; transition: background .12s; text-align: left; font-size: .76rem;
+}
+.alertDdItem:hover { background: var(--bg); }
+.alertDdRed   { color: var(--red); }
+.alertDdAmber { color: var(--amber); }
+.alertDdOk    { color: var(--green); font-size: .74rem; }
+.alertDdIcon  { font-size: .45rem; flex-shrink: 0; }
+
+/* ── Search ── */
 .searchForm {
   position: relative; display: flex; align-items: center;
 }
 .searchIcon {
-  position: absolute; left: .6rem;
-  width: 12px; height: 12px;
+  position: absolute; left: .6rem; width: 12px; height: 12px;
   stroke: var(--ink4); fill: none; stroke-width: 1.5; stroke-linecap: round;
   pointer-events: none;
 }
@@ -119,54 +144,38 @@
   font-family: var(--font-m); font-size: .6rem;
   color: var(--green); letter-spacing: .04em;
 }
-
 .syncDot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green2);
-  animation: pulse-green 3s ease infinite;
+  background: var(--green2); animation: pulse-green 3s ease infinite;
 }
 
-.userPill {
-  display: flex; align-items: center; gap: .4rem;
-}
-
+/* ── User pill ── */
+.userPill { display: flex; align-items: center; gap: .4rem; }
 .avatar {
-  width: 26px; height: 26px;
-  background: var(--ink);
-  color: var(--bg);
+  width: 26px; height: 26px; background: var(--ink); color: var(--bg);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-d); font-size: .65rem; font-weight: 700;
 }
-
-.userName {
-  font-size: .75rem; color: var(--ink2); font-weight: 500;
-}
-
+.userName { font-size: .75rem; color: var(--ink2); font-weight: 500; }
 .userRole {
   font-family: var(--font-m); font-size: .58rem;
   color: var(--ink4); letter-spacing: .06em;
-  padding: .1rem .35rem;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  padding: .1rem .35rem; border: 1px solid var(--border); background: var(--bg);
 }
 
+/* ── Responsive ── */
 @media (max-width: 1000px) {
   .nav { display: none; }
 }
-
 @media (max-width: 640px) {
   .syncBadge  { display: none; }
   .userName   { display: none; }
-  /* Ocultar "/ Inventario" para que el brand no desborde en 375px */
   .brandSep   { display: none; }
   .brandScope { display: none; }
   .searchInput { width: 140px; }
   .searchInput:focus { width: 160px; }
 }
-
 @media (max-width: 400px) {
-  /* En pantallas muy pequeñas ocultar también el rol */
   .userRole { display: none; }
-  /* Reducir padding del topbar */
   .topbar { padding: 0 .75rem; gap: .5rem; }
 }

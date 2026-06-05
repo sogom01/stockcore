@@ -48,6 +48,9 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
   const [filter, setFilter]         = useState<"all" | "ok" | "low" | "out">("all");
   const [search, setSearch]         = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [categoryId, setCategoryId] = useState("");
+  const [supplierId, setSupplierId] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [editProduct, setEditProduct]   = useState<Product | null | "new">(null);
   const [stockProduct, setStockProduct] = useState<Product | null>(null);
@@ -70,6 +73,8 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
     const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
     if (filter !== "all") params.set("filter", filter);
     if (debouncedSearch.trim()) params.set("q", debouncedSearch.trim());
+    if (categoryId) params.set("categoryId", categoryId);
+    if (supplierId) params.set("supplierId", supplierId);
 
     const res = await fetch(`/api/products?${params}`);
     if (res.ok) {
@@ -78,9 +83,12 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
       setTotal(json.total);
     }
     setLoading(false);
-  }, [page, filter, debouncedSearch]);
+  }, [page, filter, debouncedSearch, categoryId, supplierId]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  // Resetear página al cambiar filtros avanzados
+  useEffect(() => { setPage(1); }, [categoryId, supplierId]);
 
   function toast(text: string, type: ToastMsg["type"] = "success") {
     const id = Date.now();
@@ -211,7 +219,8 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
       </div>
 
       {/* Controles */}
-      <div className={styles.controls}>
+      <div className={styles.controls} style={{ alignItems: "flex-start", flexDirection: "column", gap: ".5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: ".75rem", flexWrap: "wrap", width: "100%" }}>
         <div className={styles.filters}>
           {(["all", "ok", "low", "out"] as const).map(f => (
             <button
@@ -240,6 +249,59 @@ export default function ProductsClient({ categories, suppliers, role, initialSea
             </button>
           )}
         </div>
+
+        {/* Botón toggle filtros avanzados */}
+        <button
+          className={`${styles.filtersToggle}${filtersOpen ? ` ${styles.filtersToggleOpen}` : ""}${categoryId || supplierId ? ` ${styles.filtersToggleActive}` : ""}`}
+          onClick={() => setFiltersOpen(v => !v)}
+        >
+          <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Filtros avanzados
+          {(categoryId || supplierId) && <span className={styles.filterActiveDot}/>}
+        </button>
+        </div>
+
+        {/* Panel de filtros avanzados */}
+        {filtersOpen && (
+          <div className={styles.advFilters}>
+            <div className={styles.advFilterField}>
+              <label className={styles.advFilterLabel}>Categoría</label>
+              <select
+                className="input"
+                value={categoryId}
+                onChange={e => setCategoryId(e.target.value)}
+              >
+                <option value="">Todas las categorías</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.advFilterField}>
+              <label className={styles.advFilterLabel}>Proveedor</label>
+              <select
+                className="input"
+                value={supplierId}
+                onChange={e => setSupplierId(e.target.value)}
+              >
+                <option value="">Todos los proveedores</option>
+                {suppliers.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            {(categoryId || supplierId) && (
+              <button
+                className={`${styles.filtersToggle} btn btn-outline`}
+                onClick={() => { setCategoryId(""); setSupplierId(""); }}
+                style={{ alignSelf: "flex-end" }}
+              >
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tabla */}

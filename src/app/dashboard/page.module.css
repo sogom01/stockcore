@@ -26,7 +26,22 @@
 .kpiValue { font-family: var(--font-d); font-size: 2rem; font-weight: 800; line-height: 1; color: var(--ink); }
 .kpiSub   { font-size: .65rem; color: var(--ink4); margin-top: .3rem; line-height: 1.4; }
 
-.kpiDelta { position: absolute; top: 1rem; right: 1rem; font-family: var(--font-m); font-size: .62rem; font-weight: 500; }
+.kpiDelta {
+  position: absolute; top: .85rem; right: .875rem;
+  font-family: var(--font-m); font-size: .58rem; font-weight: 500;
+  max-width: 5rem; text-align: right; line-height: 1.3;
+  word-break: break-word;
+}
+/* En mobile el badge absolute causa solapamiento → lo movemos al flujo normal */
+@media (max-width: 520px) {
+  .kpiDelta {
+    position: static;
+    display: inline-block;
+    margin-top: .4rem;
+    max-width: none;
+  }
+  .kpi { padding-bottom: .75rem; }
+}
 .up   { color: var(--green); }
 .warn { color: var(--amber); }
 .down { color: var(--red); }

@@ -40,6 +40,31 @@
   --sidebar-w: 220px;
 }
 
+/* ── Dark mode ── */
+[data-theme="dark"] {
+  --bg:    #1C1A17;
+  --bg2:   #232119;
+  --bg3:   #2C2A24;
+  --white: #26231F;
+  --ink:   #EDE9E2;
+  --ink2:  #C4BFB7;
+  --ink3:  #888480;
+  --ink4:  #555250;
+  --border:  rgba(237,233,226,.08);
+  --border2: rgba(237,233,226,.15);
+  --green-bg:  rgba(26,138,74,.18);
+  --green-bd:  rgba(26,138,74,.3);
+  --amber-bg:  rgba(196,121,0,.18);
+  --amber-bd:  rgba(196,121,0,.3);
+  --red-bg:    rgba(192,57,43,.18);
+  --red-bd:    rgba(192,57,43,.3);
+  --blue-bg:   rgba(26,95,168,.18);
+  --blue-bd:   rgba(26,95,168,.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.5),  0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,.55),0 4px 8px rgba(0,0,0,.35);
+}
+
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 
