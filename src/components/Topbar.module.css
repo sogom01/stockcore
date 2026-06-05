@@ -149,12 +149,21 @@
   background: var(--green2); animation: pulse-green 3s ease infinite;
 }
 
-/* ── User pill ── */
-.userPill { display: flex; align-items: center; gap: .4rem; }
+/* ── Avatar button + user dropdown ── */
+.userMenuWrap { position: relative; }
+
+.avatarBtn {
+  display: flex; align-items: center; gap: .4rem;
+  background: none; border: 1px solid transparent; cursor: pointer;
+  padding: .25rem .4rem; transition: all .15s;
+}
+.avatarBtn:hover,
+.avatarBtnOpen { border-color: var(--border2); background: var(--bg); }
+
 .avatar {
   width: 26px; height: 26px; background: var(--ink); color: var(--bg);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-d); font-size: .65rem; font-weight: 700;
+  font-family: var(--font-d); font-size: .65rem; font-weight: 700; flex-shrink: 0;
 }
 .userName { font-size: .75rem; color: var(--ink2); font-weight: 500; }
 .userRole {
@@ -162,6 +171,44 @@
   color: var(--ink4); letter-spacing: .06em;
   padding: .1rem .35rem; border: 1px solid var(--border); background: var(--bg);
 }
+.avatarChevron {
+  width: 12px; height: 12px; stroke: var(--ink4); fill: none;
+  stroke-width: 2; stroke-linecap: round; flex-shrink: 0;
+  transition: transform .2s;
+}
+.avatarBtnOpen .avatarChevron { transform: rotate(180deg); }
+
+/* Dropdown */
+.userDropdown {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  width: 220px; background: var(--white); border: 1px solid var(--border2);
+  box-shadow: var(--shadow-lg); z-index: 300; animation: fadeIn .15s ease;
+}
+.userDdHeader {
+  display: flex; align-items: flex-start; gap: .625rem;
+  padding: .875rem; border-bottom: 1px solid var(--border);
+}
+.userDdAvatar {
+  width: 34px; height: 34px; flex-shrink: 0; background: var(--ink); color: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: .8rem; font-weight: 700;
+}
+.userDdName  { font-size: .8rem; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.userDdEmail { font-family: var(--font-m); font-size: .6rem; color: var(--ink4); margin-top: .15rem; word-break: break-all; }
+.userDdDivider { height: 1px; background: var(--border); }
+.userDdItem {
+  display: flex; align-items: center; gap: .5rem;
+  width: 100%; padding: .6rem .875rem; border: none; background: none;
+  font-family: var(--font-b); font-size: .78rem; color: var(--ink2);
+  cursor: pointer; transition: background .12s; text-align: left;
+}
+.userDdItem svg { width: 13px; height: 13px; stroke: var(--ink3); fill: none; stroke-width: 1.5; stroke-linecap: round; flex-shrink: 0; }
+.userDdItem:hover { background: var(--bg); color: var(--ink); }
+.userDdItem:hover svg { stroke: var(--ink); }
+.userDdLogout { color: var(--red); }
+.userDdLogout svg { stroke: var(--red); }
+.userDdLogout:hover { background: var(--red-bg); color: var(--red); }
+.userDdLogoutForm { display: contents; }
 
 /* ── Responsive ── */
 @media (max-width: 1000px) {
