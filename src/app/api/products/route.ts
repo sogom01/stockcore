@@ -3,35 +3,53 @@ import { prisma } from "@/lib/prisma";
 import { productSchema } from "@/schemas/product";
 import { getSession } from "@/lib/session";
 
+export const PAGE_SIZE = 20;
+
 export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { searchParams } = req.nextUrl;
-  const filter = searchParams.get("filter");
-  const q = searchParams.get("q");
+  const filter   = searchParams.get("filter");
+  const q        = searchParams.get("q");
+  const page     = Math.max(1, Number(searchParams.get("page") ?? "1"));
+  const pageSize = Math.min(100, Math.max(1, Number(searchParams.get("pageSize") ?? String(PAGE_SIZE))));
 
-  const products = await prisma.product.findMany({
-    where: {
-      status: "ACTIVE",
-      ...(filter === "low" && { stock: { gt: 0 } }),
-      ...(filter === "out" && { stock: 0 }),
-      ...(q && {
-        OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { sku: { contains: q, mode: "insensitive" } },
-        ],
-      }),
-    },
-    include: { category: true, supplier: true },
-    orderBy: { updatedAt: "desc" },
-  });
+  const baseWhere = {
+    status: "ACTIVE" as const,
+    ...(q && {
+      OR: [
+        { name: { contains: q, mode: "insensitive" as const } },
+        { sku:  { contains: q, mode: "insensitive" as const } },
+      ],
+    }),
+  };
 
-  const data = filter === "low"
-    ? products.filter(p => p.stock <= p.minStock)
-    : products;
+  // stock filter applied post-query for "low" (needs per-row comparison),
+  // but "out" can be pushed to DB
+  const dbWhere = {
+    ...baseWhere,
+    ...(filter === "out" && { stock: 0 }),
+  };
 
-  return NextResponse.json(data);
+  const [allMatching, total] = await Promise.all([
+    prisma.product.findMany({
+      where: dbWhere,
+      include: { category: true, supplier: true },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.product.count({ where: dbWhere }),
+  ]);
+
+  // apply in-memory "low" / "ok" filter (requires comparing stock vs minStock per row)
+  let filtered = allMatching;
+  if (filter === "low") filtered = allMatching.filter(p => p.stock > 0 && p.stock <= p.minStock);
+  if (filter === "ok")  filtered = allMatching.filter(p => p.stock > p.minStock);
+
+  const realTotal = filtered.length;
+  const data = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  return NextResponse.json({ data, total: realTotal, page, pageSize });
 }
 
 export async function POST(req: NextRequest) {

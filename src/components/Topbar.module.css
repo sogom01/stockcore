@@ -9,6 +9,27 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* ── Hamburger ── */
+.hamburger {
+  display: none;
+  flex-direction: column; justify-content: center; align-items: center;
+  gap: 4px; width: 32px; height: 32px; flex-shrink: 0;
+  background: none; border: 1px solid var(--border2); cursor: pointer;
+  padding: 0;
+}
+.hamburger span {
+  display: block; width: 14px; height: 1.5px;
+  background: var(--ink); transition: all .2s;
+}
+.hamburgerOpen span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+.hamburgerOpen span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburgerOpen span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+@media (max-width: 1000px) {
+  .hamburger { display: flex; }
+}
+
+/* ── Brand ── */
 .brand {
   display: flex; align-items: center;
   gap: .5rem; flex-shrink: 0;
@@ -34,11 +55,14 @@
   color: var(--ink3); letter-spacing: .03em;
 }
 
+/* ── Nav ── */
 .nav {
   display: flex; flex: 1;
   border-left: 1px solid var(--border);
   margin-left: .5rem; padding-left: .25rem;
+  overflow-x: auto; scrollbar-width: none;
 }
+.nav::-webkit-scrollbar { display: none; }
 
 .tnav {
   font-family: var(--font-d);
@@ -53,11 +77,43 @@
 .tnav:hover { color: var(--ink2); }
 .tnav.active { color: var(--ink); border-bottom-color: var(--ink); }
 
+/* ── Right ── */
 .right {
   display: flex; align-items: center;
   gap: .75rem; margin-left: auto; flex-shrink: 0;
 }
 
+/* ── Global Search ── */
+.searchBtn {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--border2); cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+}
+.searchBtn:hover { background: var(--bg); border-color: var(--ink3); }
+.searchBtn svg {
+  width: 13px; height: 13px;
+  stroke: var(--ink3); fill: none; stroke-width: 1.5; stroke-linecap: round;
+}
+
+.searchForm {
+  position: relative; display: flex; align-items: center;
+}
+.searchIcon {
+  position: absolute; left: .6rem;
+  width: 12px; height: 12px;
+  stroke: var(--ink4); fill: none; stroke-width: 1.5; stroke-linecap: round;
+  pointer-events: none;
+}
+.searchInput {
+  width: 200px; padding: .38rem .75rem .38rem 2rem;
+  background: var(--bg); border: 1px solid var(--border2);
+  font-family: var(--font-b); font-size: .78rem; color: var(--ink2);
+  outline: none; transition: border-color .15s, width .2s;
+}
+.searchInput:focus { border-color: var(--ink3); width: 240px; }
+
+/* ── Sync badge ── */
 .syncBadge {
   display: flex; align-items: center; gap: .35rem;
   font-family: var(--font-m); font-size: .6rem;
@@ -101,4 +157,6 @@
 @media (max-width: 640px) {
   .syncBadge { display: none; }
   .userName  { display: none; }
+  .searchInput { width: 140px; }
+  .searchInput:focus { width: 160px; }
 }

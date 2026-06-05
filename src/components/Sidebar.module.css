@@ -49,6 +49,40 @@
 .amber { color: var(--amber); border-color: var(--amber-bd); background: var(--amber-bg); }
 .red   { color: var(--red); border-color: var(--red-bd); background: var(--red-bg); }
 
+/* ── Mobile overlay ── */
+.overlay {
+  display: none;
+}
+
 @media (max-width: 1000px) {
-  .sidebar { display: none; }
+  .sidebar {
+    display: none;
+  }
+
+  .sidebar.mobileOpen {
+    display: flex;
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    z-index: 190;
+    box-shadow: var(--shadow-lg);
+    animation: slideInLeft .2s ease;
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: var(--topbar-h);
+    background: rgba(26, 25, 22, .45);
+    z-index: 180;
+    animation: fadeIn .15s ease;
+  }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
 }

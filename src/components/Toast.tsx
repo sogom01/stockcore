@@ -1,6 +1,6 @@
 "use client";
 
-type ToastMsg = { id: number; text: string; type: "success" | "error" | "warning" };
+export type ToastMsg = { id: number; text: string; type: "success" | "error" | "warning" };
 
 export default function Toast({ toasts }: { toasts: ToastMsg[] }) {
   if (!toasts.length) return null;

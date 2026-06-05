@@ -1,0 +1,41 @@
+.page    { display:flex; flex-direction:column; gap:.875rem; animation:fadeIn .22s ease; }
+.header  { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.title   { font-family:var(--font-d); font-size:clamp(1.4rem,3vw,1.75rem); font-weight:800; letter-spacing:-.01em; color:var(--ink); line-height:1; }
+.subtitle{ font-size:.78rem; color:var(--ink3); margin-top:.3rem; }
+
+.table { width:100%; border-collapse:collapse; }
+.table thead th {
+  font-family:var(--font-m); font-size:.58rem; letter-spacing:.12em; color:var(--ink4);
+  padding:.5rem .875rem; text-align:left; border-bottom:2px solid var(--border2);
+  font-weight:400; text-transform:uppercase; background:var(--bg); white-space:nowrap;
+}
+.table tbody td { padding:.6rem .875rem; font-size:.8rem; border-bottom:1px solid var(--border); transition:background .12s; }
+.table tbody tr:last-child td { border-bottom:none; }
+.table tbody tr:hover td { background:var(--bg); }
+
+.catCell  { display:flex; align-items:center; gap:.55rem; }
+.colorSwatch { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.catName  { font-weight:600; color:var(--ink); }
+.count    { font-family:var(--font-m); font-size:.7rem; color:var(--ink3); }
+.mono     { font-family:var(--font-m); font-size:.7rem; color:var(--ink4); }
+.empty    { text-align:center; padding:2.5rem; color:var(--ink4); font-size:.82rem; }
+
+.actions   { display:flex; gap:.3rem; }
+.actionBtn { width:26px; height:26px; border:1px solid var(--border); background:var(--bg); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .14s; }
+.actionBtn svg { width:12px; height:12px; stroke:var(--ink3); fill:none; stroke-width:1.5; stroke-linecap:round; }
+.actionBtn:hover { background:var(--ink); border-color:var(--ink); }
+.actionBtn:hover svg { stroke:var(--bg); }
+.actionDanger:hover { background:var(--red); border-color:var(--red); }
+
+/* Color picker */
+.colorGrid   { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.colorDot    { width:22px; height:22px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:transform .12s; outline:none; }
+.colorDot:hover { transform:scale(1.15); }
+.colorDotActive { outline:2px solid var(--ink); outline-offset:2px; }
+.colorPicker { width:22px; height:22px; padding:0; border:1px solid var(--border2); cursor:pointer; background:none; }
+
+.colorPreview    { margin-top:.5rem; }
+.catBadgePreview {
+  font-family:var(--font-m); font-size:.6rem; letter-spacing:.04em;
+  padding:.2rem .6rem; border:1px solid; display:inline-block;
+}

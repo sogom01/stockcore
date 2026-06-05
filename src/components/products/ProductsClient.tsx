@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import ProductTable from "./ProductTable";
 import ProductModal from "./ProductModal";
 import StockModal from "./StockModal";
-import Toast from "@/components/Toast";
+import Toast, { ToastMsg } from "@/components/Toast";
 import styles from "./Products.module.css";
 
 type Category = { id: string; name: string; color: string };
@@ -18,21 +18,55 @@ type Product   = {
 };
 
 type Props = {
-  initialProducts: Product[];
   categories: Category[];
-  suppliers: Supplier[];
-  role: string;
+  suppliers:  Supplier[];
+  role:       string;
+  initialSearch?: string;
 };
 
-export type ToastMsg = { id: number; text: string; type: "success" | "error" | "warning" };
+const PAGE_SIZE = 20;
 
-export default function ProductsClient({ initialProducts, categories, suppliers, role }: Props) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [filter, setFilter] = useState<"all" | "ok" | "low" | "out">("all");
-  const [search, setSearch] = useState("");
-  const [editProduct, setEditProduct] = useState<Product | null | "new">(null);
+export default function ProductsClient({ categories, suppliers, role, initialSearch = "" }: Props) {
+  const [products, setProducts]     = useState<Product[]>([]);
+  const [total, setTotal]           = useState(0);
+  const [loading, setLoading]       = useState(true);
+  const [page, setPage]             = useState(1);
+  const [filter, setFilter]         = useState<"all" | "ok" | "low" | "out">("all");
+  const [search, setSearch]         = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+
+  const [editProduct, setEditProduct]   = useState<Product | null | "new">(null);
   const [stockProduct, setStockProduct] = useState<Product | null>(null);
-  const [toasts, setToasts] = useState<ToastMsg[]>([]);
+  const [toasts, setToasts]             = useState<ToastMsg[]>([]);
+
+  // Debounce search
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // reset page on new search
+    }, 350);
+    return () => { if (debounceTimer.current) clearTimeout(debounceTimer.current); };
+  }, [search]);
+
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
+    if (filter !== "all") params.set("filter", filter);
+    if (debouncedSearch.trim()) params.set("q", debouncedSearch.trim());
+
+    const res = await fetch(`/api/products?${params}`);
+    if (res.ok) {
+      const json = await res.json();
+      setProducts(json.data);
+      setTotal(json.total);
+    }
+    setLoading(false);
+  }, [page, filter, debouncedSearch]);
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   function toast(text: string, type: ToastMsg["type"] = "success") {
     const id = Date.now();
@@ -40,23 +74,41 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
   }
 
-  const filtered = useMemo(() => {
-    let list = products;
-    if (filter === "ok")  list = list.filter(p => p.stock > p.minStock);
-    if (filter === "low") list = list.filter(p => p.stock > 0 && p.stock <= p.minStock);
-    if (filter === "out") list = list.filter(p => p.stock === 0);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)
-      );
-    }
-    return list;
-  }, [products, filter, search]);
+  // ── CSV Export ──────────────────────────────────────────────────────────
+  function exportCSV() {
+    if (products.length === 0) { toast("No hay productos para exportar", "warning"); return; }
 
+    const headers = ["Nombre", "SKU", "Categoría", "Stock", "Stock Mínimo", "Unidad", "Precio (COP)", "Proveedor"];
+    const rows = products.map(p => [
+      p.name,
+      p.sku,
+      p.category?.name ?? "",
+      p.stock,
+      p.minStock,
+      p.unit,
+      p.price,
+      p.supplier?.name ?? "",
+    ]);
+
+    const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const csv = [headers, ...rows].map(r => r.map(escape).join(",")).join("\r\n");
+
+    const bom  = "﻿"; // BOM para Excel en español
+    const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement("a"), {
+      href: url,
+      download: `stockcore-productos-${new Date().toISOString().slice(0, 10)}.csv`,
+    });
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(`${products.length} productos exportados`);
+  }
+
+  // ── CRUD handlers ────────────────────────────────────────────────────────
   async function handleSave(data: Partial<Product> & { id?: string }) {
     const isEdit = Boolean(data.id);
-    const url = isEdit ? `/api/products/${data.id}` : "/api/products";
+    const url    = isEdit ? `/api/products/${data.id}` : "/api/products";
     const method = isEdit ? "PATCH" : "POST";
 
     const res = await fetch(url, {
@@ -66,21 +118,15 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      toast(err.error ?? "Error al guardar", "error");
+      toast((await res.json()).error ?? "Error al guardar", "error");
       return;
     }
 
     const saved: Product = await res.json();
-
-    if (isEdit) {
-      setProducts(ps => ps.map(p => p.id === saved.id ? saved : p));
-      toast(`"${saved.name}" actualizado correctamente`);
-    } else {
-      setProducts(ps => [saved, ...ps]);
-      toast(`"${saved.name}" creado correctamente`);
-    }
+    toast(`"${saved.name}" ${isEdit ? "actualizado" : "creado"} correctamente`);
     setEditProduct(null);
+    setPage(1);
+    fetchProducts();
   }
 
   async function handleDelete(id: string, name: string) {
@@ -89,8 +135,8 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
     const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
     if (!res.ok) { toast("Error al eliminar", "error"); return; }
 
-    setProducts(ps => ps.filter(p => p.id !== id));
     toast(`"${name}" eliminado`);
+    fetchProducts();
   }
 
   async function handleStock(productId: string, type: string, quantity: number, note: string) {
@@ -101,28 +147,24 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      toast(err.error ?? "Error al registrar movimiento", "error");
+      toast((await res.json()).error ?? "Error al registrar movimiento", "error");
       return;
     }
 
-    const delta = type === "ENTRADA" ? quantity : type === "SALIDA" ? -quantity : 0;
-    setProducts(ps => ps.map(p =>
-      p.id === productId
-        ? { ...p, stock: type === "AJUSTE" ? quantity : p.stock + delta }
-        : p
-    ));
-
-    toast(`Movimiento registrado correctamente`);
+    toast("Movimiento registrado correctamente");
     setStockProduct(null);
+    fetchProducts();
   }
 
-  const counts = {
-    all: products.length,
-    ok:  products.filter(p => p.stock > p.minStock).length,
-    low: products.filter(p => p.stock > 0 && p.stock <= p.minStock).length,
-    out: products.filter(p => p.stock === 0).length,
-  };
+  // ── Pagination helpers ───────────────────────────────────────────────────
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const from       = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const to         = Math.min(page * PAGE_SIZE, total);
+
+  function handleFilter(f: typeof filter) {
+    setFilter(f);
+    setPage(1);
+  }
 
   return (
     <div className={styles.page}>
@@ -130,34 +172,47 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Productos</h1>
-          <p className={styles.subtitle}>{products.length} productos activos en inventario</p>
+          <p className={styles.subtitle}>
+            {loading ? "Cargando…" : `${total} producto${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`}
+          </p>
         </div>
-        {role !== "VISOR" && (
-          <button className="btn btn-ink" onClick={() => setEditProduct("new")}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        <div className={styles.headerActions}>
+          <button className="btn btn-outline" onClick={exportCSV} title="Exportar lista actual como CSV">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Nuevo producto
+            Exportar CSV
           </button>
-        )}
+          {role !== "VISOR" && (
+            <button className="btn btn-ink" onClick={() => setEditProduct("new")}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Nuevo producto
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Controles */}
       <div className={styles.controls}>
         <div className={styles.filters}>
-          {(["all","ok","low","out"] as const).map(f => (
+          {(["all", "ok", "low", "out"] as const).map(f => (
             <button
               key={f}
               className={`${styles.fpill} ${styles[f]}${filter === f ? ` ${styles.fpillActive}` : ""}`}
-              onClick={() => setFilter(f)}
+              onClick={() => handleFilter(f)}
             >
               {f === "all" ? "Todos" : f === "ok" ? "En stock" : f === "low" ? "Stock bajo" : "Agotados"}
-              <span className={styles.fpillCount}>{counts[f]}</span>
             </button>
           ))}
         </div>
         <div className={styles.searchWrap}>
-          <svg className={styles.searchIcon} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg className={styles.searchIcon} viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
           <input
             className={styles.searchInput}
             type="text"
@@ -165,17 +220,67 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
+          {search && (
+            <button className={styles.searchClear} onClick={() => setSearch("")} title="Limpiar">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Tabla */}
-      <ProductTable
-        products={filtered}
-        role={role}
-        onEdit={p => setEditProduct(p as Product)}
-        onDelete={handleDelete}
-        onStock={p => setStockProduct(p as Product)}
-      />
+      {loading ? (
+        <div className={styles.loadingState}>
+          <div className={styles.spinner} />
+          <span>Cargando productos…</span>
+        </div>
+      ) : (
+        <ProductTable
+          products={products}
+          role={role}
+          onEdit={p => setEditProduct(p as Product)}
+          onDelete={handleDelete}
+          onStock={p => setStockProduct(p as Product)}
+        />
+      )}
+
+      {/* Paginación */}
+      {!loading && total > PAGE_SIZE && (
+        <div className={styles.pagination}>
+          <span className={styles.paginInfo}>
+            {from}–{to} de {total}
+          </span>
+          <div className={styles.paginControls}>
+            <button
+              className={styles.paginBtn}
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+              title="Página anterior"
+            >
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span className={styles.paginPages}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                <button
+                  key={n}
+                  className={`${styles.paginNum}${n === page ? ` ${styles.paginNumActive}` : ""}`}
+                  onClick={() => setPage(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </span>
+            <button
+              className={styles.paginBtn}
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+              title="Página siguiente"
+            >
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal crear/editar */}
       {editProduct !== null && (
@@ -197,7 +302,6 @@ export default function ProductsClient({ initialProducts, categories, suppliers,
         />
       )}
 
-      {/* Toasts */}
       <Toast toasts={toasts} />
     </div>
   );
