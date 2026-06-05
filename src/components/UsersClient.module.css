@@ -1,0 +1,25 @@
+.page { display:flex; flex-direction:column; gap:.875rem; animation:fadeIn .22s ease; }
+.header { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.title  { font-family:var(--font-d); font-size:clamp(1.4rem,3vw,1.75rem); font-weight:800; letter-spacing:-.01em; color:var(--ink); line-height:1; }
+.subtitle { font-size:.78rem; color:var(--ink3); margin-top:.3rem; }
+
+.limitBar { background:var(--white); border:1px solid var(--border); padding:.875rem 1.125rem; box-shadow:var(--shadow-sm); }
+.limitInfo { display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; }
+.limitLabel { font-family:var(--font-m); font-size:.62rem; letter-spacing:.08em; color:var(--ink3); text-transform:uppercase; }
+.limitCount { font-family:var(--font-d); font-size:.85rem; font-weight:700; color:var(--ink); }
+.limitTrack { height:6px; background:var(--bg2); overflow:hidden; }
+.limitFill  { height:100%; background:var(--ink); transition:width .6s ease; }
+
+.table { width:100%; border-collapse:collapse; }
+.table thead th { font-family:var(--font-m); font-size:.58rem; letter-spacing:.12em; color:var(--ink4); padding:.5rem .875rem; text-align:left; border-bottom:2px solid var(--border2); font-weight:400; text-transform:uppercase; background:var(--bg); }
+.table tbody td { padding:.6rem .875rem; font-size:.78rem; border-bottom:1px solid var(--border); transition:background .12s; vertical-align:middle; }
+.table tbody tr:last-child td { border-bottom:none; }
+.table tbody tr:hover td { background:var(--bg); }
+
+.userCell { display:flex; align-items:center; gap:.625rem; }
+.avatar { width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-family:var(--font-d); font-size:.7rem; font-weight:800; color:white; flex-shrink:0; }
+.userName { font-weight:600; color:var(--ink); font-size:.8rem; }
+.youBadge { display:inline-block; font-family:var(--font-m); font-size:.52rem; padding:.05rem .3rem; background:var(--ink); color:var(--bg); letter-spacing:.06em; margin-top:.15rem; }
+.email { font-family:var(--font-m); font-size:.68rem; color:var(--ink3); }
+.roleBadge { font-family:var(--font-m); font-size:.6rem; padding:.2rem .55rem; border:1px solid; letter-spacing:.06em; font-weight:500; }
+.date { font-family:var(--font-m); font-size:.62rem; color:var(--ink4); white-space:nowrap; }

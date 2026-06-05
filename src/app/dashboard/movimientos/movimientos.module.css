@@ -1,0 +1,30 @@
+.page { display:flex; flex-direction:column; gap:.875rem; animation:fadeIn .22s ease; }
+.header { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.title  { font-family:var(--font-d); font-size:clamp(1.4rem,3vw,1.75rem); font-weight:800; letter-spacing:-.01em; color:var(--ink); line-height:1; }
+.subtitle { font-size:.78rem; color:var(--ink3); margin-top:.3rem; }
+
+.kpiRow { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; }
+.kpi { background:var(--white); border:1px solid var(--border); padding:.875rem 1.125rem; box-shadow:var(--shadow-sm); }
+.kpiLabel { font-family:var(--font-m); font-size:.58rem; letter-spacing:.1em; color:var(--ink4); text-transform:uppercase; margin-bottom:.35rem; }
+.kpiVal { font-family:var(--font-d); font-size:1.5rem; font-weight:800; line-height:1; }
+
+.table { width:100%; border-collapse:collapse; }
+.table thead th { font-family:var(--font-m); font-size:.58rem; letter-spacing:.12em; color:var(--ink4); padding:.5rem .875rem; text-align:left; border-bottom:2px solid var(--border2); font-weight:400; text-transform:uppercase; background:var(--bg); white-space:nowrap; }
+.table tbody td { padding:.55rem .875rem; font-size:.78rem; border-bottom:1px solid var(--border); transition:background .12s; vertical-align:middle; }
+.table tbody tr:last-child td { border-bottom:none; }
+.table tbody tr:hover td { background:var(--bg); }
+
+.typeBadge { font-family:var(--font-m); font-size:.6rem; font-weight:500; letter-spacing:.06em; padding:.2rem .6rem; border:1px solid; white-space:nowrap; display:inline-block; }
+.entrada { color:var(--green); border-color:var(--green-bd); background:var(--green-bg); }
+.salida  { color:var(--red); border-color:var(--red-bd); background:var(--red-bg); }
+.ajuste  { color:var(--blue); border-color:var(--blue-bd); background:var(--blue-bg); }
+
+.productName { font-weight:600; color:var(--ink); font-size:.78rem; }
+.productSku  { font-family:var(--font-m); font-size:.58rem; color:var(--ink4); margin-top:.1rem; }
+.qty  { font-family:var(--font-d); font-weight:700; font-size:.82rem; }
+.note { font-size:.72rem; color:var(--ink3); max-width:200px; }
+.user { font-size:.72rem; color:var(--ink3); white-space:nowrap; }
+.time { font-family:var(--font-m); font-size:.62rem; color:var(--ink4); white-space:nowrap; }
+
+@media (max-width:1280px) { .kpiRow { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:640px)  { .kpiRow { grid-template-columns:repeat(2,1fr); } }

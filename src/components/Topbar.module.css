@@ -1,0 +1,104 @@
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--white);
+  border-bottom: 1px solid var(--border2);
+  height: var(--topbar-h);
+  display: flex; align-items: center;
+  padding: 0 1.25rem;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.brand {
+  display: flex; align-items: center;
+  gap: .5rem; flex-shrink: 0;
+}
+
+.brandMark {
+  width: 28px; height: 28px;
+  background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.brandMark svg { width: 14px; height: 14px; }
+
+.brandName {
+  font-family: var(--font-d);
+  font-size: 1rem; font-weight: 800;
+  letter-spacing: .04em; color: var(--ink);
+}
+
+.brandSep { width: 1px; height: 18px; background: var(--border2); }
+
+.brandScope {
+  font-size: .7rem; font-weight: 500;
+  color: var(--ink3); letter-spacing: .03em;
+}
+
+.nav {
+  display: flex; flex: 1;
+  border-left: 1px solid var(--border);
+  margin-left: .5rem; padding-left: .25rem;
+}
+
+.tnav {
+  font-family: var(--font-d);
+  font-size: .7rem; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  padding: .45rem 1rem;
+  color: var(--ink4); background: none; border: none;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  white-space: nowrap;
+}
+.tnav:hover { color: var(--ink2); }
+.tnav.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+.right {
+  display: flex; align-items: center;
+  gap: .75rem; margin-left: auto; flex-shrink: 0;
+}
+
+.syncBadge {
+  display: flex; align-items: center; gap: .35rem;
+  font-family: var(--font-m); font-size: .6rem;
+  color: var(--green); letter-spacing: .04em;
+}
+
+.syncDot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green2);
+  animation: pulse-green 3s ease infinite;
+}
+
+.userPill {
+  display: flex; align-items: center; gap: .4rem;
+}
+
+.avatar {
+  width: 26px; height: 26px;
+  background: var(--ink);
+  color: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-d); font-size: .65rem; font-weight: 700;
+}
+
+.userName {
+  font-size: .75rem; color: var(--ink2); font-weight: 500;
+}
+
+.userRole {
+  font-family: var(--font-m); font-size: .58rem;
+  color: var(--ink4); letter-spacing: .06em;
+  padding: .1rem .35rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+@media (max-width: 1000px) {
+  .nav { display: none; }
+}
+
+@media (max-width: 640px) {
+  .syncBadge { display: none; }
+  .userName  { display: none; }
+}
